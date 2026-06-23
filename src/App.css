@@ -1,0 +1,202 @@
+.app-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  background: var(--bg);
+}
+
+.scene-panel {
+  position: relative;
+  min-height: 100svh;
+  background: #eef2f3;
+}
+
+.scene-panel canvas {
+  display: block;
+}
+
+.scene-status {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.scene-status span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(18, 24, 38, 0.12);
+  border-radius: 6px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #1c2430;
+  font-size: 14px;
+  box-shadow: var(--shadow);
+}
+
+.lesson-panel {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  border-left: 1px solid var(--border);
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.lesson-kicker {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.lesson-panel h1 {
+  max-width: 11ch;
+}
+
+.lesson-intro {
+  color: var(--text);
+}
+
+.step-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  background: #fafafa;
+}
+
+.step-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.step-card h2 {
+  margin-bottom: 10px;
+}
+
+.step-controls {
+  display: grid;
+  grid-template-columns: 96px minmax(84px, 1fr) 96px;
+  align-items: center;
+  gap: 12px;
+}
+
+button {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+button:focus-visible {
+  border-color: var(--accent);
+}
+
+button:focus-visible {
+  outline: 3px solid rgba(26, 115, 232, 0.18);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+}
+
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.progress-track {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.progress-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d9dde3;
+}
+
+.progress-dot.active {
+  background: var(--accent);
+}
+
+.step-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: auto 0 0;
+  list-style: none;
+}
+
+.step-list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.step-list span {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.step-list .selected button {
+  border-color: rgba(26, 115, 232, 0.42);
+  background: #eef5ff;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .scene-panel {
+    min-height: 56svh;
+  }
+
+  .lesson-panel {
+    min-height: auto;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    padding: 24px 18px 28px;
+  }
+
+  .lesson-panel h1 {
+    max-width: 14ch;
+  }
+
+  .scene-status {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
