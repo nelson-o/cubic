@@ -131,11 +131,31 @@ function CameraRig({ position }: { position: readonly [number, number, number] }
     [layout.distance, position],
   )
 
-  useFrame(() => {
-    camera.position.lerp(target, 0.08)
+  useEffect(() => {
+    camera.position.copy(target)
     camera.lookAt(0, layout.targetY, 0)
-  })
+    camera.updateProjectionMatrix()
+  }, [camera, layout.targetY, target])
   return null
+}
+
+function CameraOrbit({ enabled }: { enabled: boolean }) {
+  const { size } = useThree()
+  const layout = sceneLayout(size.width, size.height)
+
+  return (
+    <OrbitControls
+      enabled={enabled}
+      enableDamping
+      dampingFactor={0.08}
+      enablePan={false}
+      minDistance={5}
+      maxDistance={10}
+      minPolarAngle={0.3}
+      maxPolarAngle={Math.PI - 0.3}
+      target={[0, layout.targetY, 0]}
+    />
+  )
 }
 
 class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
@@ -177,12 +197,7 @@ export function CubeScene(props: CubeSceneProps) {
         <directionalLight position={[-4, 2, -3]} intensity={0.8} />
         <CameraRig position={props.cameraPosition} />
         <AnimatedCube {...props} />
-        <OrbitControls
-          enabled={!props.playing}
-          enablePan={false}
-          minDistance={5}
-          maxDistance={10}
-        />
+        <CameraOrbit enabled={!props.playing} />
       </Canvas>
     </SceneBoundary>
   )
