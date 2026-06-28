@@ -1,8 +1,21 @@
 # Cubic
 
-Cubic is a GitHub Pages learning site for exploring a Rubik-style cube through
-step-by-step resolving states. The first version presents a 3D mock cube, orbit
-controls, highlighted target pieces, and a short guided tutorial.
+Cubic is a fixed-viewport GitHub Pages learning site for replaying a complete
+beginner layer-by-layer Rubik-style cube method. The cube state and every face
+turn are modeled directly, so lesson animations finish at verified solving
+checkpoints rather than visual mock states.
+
+## Tutorial
+
+The replay library covers white cross, white corners, middle edges, yellow
+cross, yellow face orientation, yellow corner positioning, and final edge
+positioning. Use Play/Pause and Restart to inspect each algorithm, change replay
+speed when needed, and drag the cube while playback is paused. The Cases button
+opens the complete three-layer lesson library without leaving the WebGL stage.
+
+The document itself never scrolls. Desktop controls float beside the cube and
+phone controls stay in a compact bottom overlay; only the optional case library
+has its own contained scrolling region.
 
 ## Stack
 

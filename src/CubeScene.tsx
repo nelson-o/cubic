@@ -1,185 +1,189 @@
 import { Edges, OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
-import { Euler, Vector3, type Group } from 'three'
-import type { CubeHighlight, CubiePosition, FaceName, TutorialStep } from './tutorial'
+import { Component, useEffect, useMemo, useRef, useState, type ErrorInfo, type ReactNode } from 'react'
+import { Vector3, type Group } from 'three'
+import type { CubeState, Face, Move, Sticker, Vec3 } from './cube'
+import { cubiesFromState, moveAffectsPosition, moveRotation, sceneLayout, type ViewCubie } from './cubeView'
 
 type CubeSceneProps = {
-  step: TutorialStep
+  cube: CubeState
+  activeMove?: Move
+  animationKey: string
+  focusedPieces: readonly string[]
+  cameraPosition: readonly [number, number, number]
+  playing: boolean
+  reducedMotion: boolean
+  speed: number
+  onMoveComplete: () => void
 }
 
-type FaceConfig = {
-  position: readonly [number, number, number]
-  rotation: readonly [number, number, number]
-  color: string
+const CUBIE_GAP = 1.045
+const STICKER_COLORS: Record<Face, string> = {
+  U: '#ffd500',
+  D: '#f8fafc',
+  F: '#169b62',
+  B: '#2563eb',
+  R: '#dc2626',
+  L: '#f97316',
 }
 
-const CUBIE_POSITIONS = [-1, 0, 1] as const
-const CUBIE_GAP = 1.06
-
-const faceConfigs: Record<FaceName, FaceConfig> = {
-  front: {
-    position: [0, 0, 0.511],
-    rotation: [0, 0, 0],
-    color: '#e74c3c',
-  },
-  back: {
-    position: [0, 0, -0.511],
-    rotation: [0, Math.PI, 0],
-    color: '#f28c28',
-  },
-  left: {
-    position: [-0.511, 0, 0],
-    rotation: [0, -Math.PI / 2, 0],
-    color: '#2364aa',
-  },
-  right: {
-    position: [0.511, 0, 0],
-    rotation: [0, Math.PI / 2, 0],
-    color: '#2ca58d',
-  },
-  top: {
-    position: [0, 0.511, 0],
-    rotation: [-Math.PI / 2, 0, 0],
-    color: '#f3d34a',
-  },
-  bottom: {
-    position: [0, -0.511, 0],
-    rotation: [Math.PI / 2, 0, 0],
-    color: '#f7f7f2',
-  },
+function normalRotation([x, y, z]: Vec3): [number, number, number] {
+  if (x === 1) return [0, Math.PI / 2, 0]
+  if (x === -1) return [0, -Math.PI / 2, 0]
+  if (y === 1) return [-Math.PI / 2, 0, 0]
+  if (y === -1) return [Math.PI / 2, 0, 0]
+  if (z === -1) return [0, Math.PI, 0]
+  return [0, 0, 0]
 }
 
-function positionKey(position: CubiePosition) {
-  return position.join(',')
-}
-
-function isFaceVisible(face: FaceName, [x, y, z]: CubiePosition) {
+function Facelet({ sticker, highlighted }: { sticker: Sticker; highlighted: boolean }) {
+  const position = sticker.normal.map((value) => value * 0.511) as [number, number, number]
   return (
-    (face === 'front' && z === 1) ||
-    (face === 'back' && z === -1) ||
-    (face === 'left' && x === -1) ||
-    (face === 'right' && x === 1) ||
-    (face === 'top' && y === 1) ||
-    (face === 'bottom' && y === -1)
-  )
-}
-
-function highlightMap(highlights: readonly CubeHighlight[]) {
-  return new Map(highlights.map((highlight) => [positionKey(highlight.position), highlight]))
-}
-
-function CameraRig({ step }: CubeSceneProps) {
-  const { camera } = useThree()
-  const target = useMemo(() => new Vector3(...step.cameraPosition), [step.cameraPosition])
-
-  useFrame(() => {
-    camera.position.lerp(target, 0.05)
-    camera.lookAt(0, 0, 0)
-  })
-
-  return null
-}
-
-function Facelet({
-  face,
-  highlighted,
-}: {
-  face: FaceName
-  highlighted: boolean
-}) {
-  const config = faceConfigs[face]
-
-  return (
-    <mesh position={config.position} rotation={config.rotation}>
+    <mesh position={position} rotation={normalRotation(sticker.normal)}>
       <planeGeometry args={[0.82, 0.82]} />
       <meshStandardMaterial
-        color={config.color}
-        emissive={highlighted ? '#f7d154' : '#000000'}
-        emissiveIntensity={highlighted ? 0.24 : 0}
-        roughness={0.44}
-        metalness={0.02}
+        color={STICKER_COLORS[sticker.color]}
+        emissive={highlighted ? '#ffd166' : '#000000'}
+        emissiveIntensity={highlighted ? 0.22 : 0}
+        roughness={0.4}
       />
     </mesh>
   )
 }
 
-function Cubie({
-  position,
-  highlight,
-}: {
-  position: CubiePosition
-  highlight?: CubeHighlight
-}) {
-  const visibleFaces = (Object.keys(faceConfigs) as FaceName[]).filter((face) =>
-    isFaceVisible(face, position),
-  )
-  const highlightedFaces = new Set(highlight?.faces ?? visibleFaces)
-  const isHighlighted = Boolean(highlight)
-
+function Cubie({ cubie, highlighted }: { cubie: ViewCubie; highlighted: boolean }) {
+  const position = cubie.position.map((value) => value * CUBIE_GAP) as [number, number, number]
   return (
-    <group position={position.map((value) => value * CUBIE_GAP) as [number, number, number]}>
+    <group position={position}>
       <mesh>
         <boxGeometry args={[0.98, 0.98, 0.98]} />
-        <meshStandardMaterial color={isHighlighted ? '#252936' : '#151821'} roughness={0.62} />
-        <Edges color={isHighlighted ? '#f7d154' : '#454a57'} linewidth={isHighlighted ? 2.2 : 1} />
+        <meshStandardMaterial color={highlighted ? '#242a35' : '#11151d'} roughness={0.7} />
+        <Edges color={highlighted ? '#ffd166' : '#3f4652'} linewidth={highlighted ? 2 : 1} />
       </mesh>
-      {visibleFaces.map((face) => (
-        <Facelet key={face} face={face} highlighted={highlightedFaces.has(face)} />
+      {cubie.stickers.map((sticker) => (
+        <Facelet key={sticker.id} sticker={sticker} highlighted={highlighted} />
       ))}
     </group>
   )
 }
 
-function RubikMock({ step }: CubeSceneProps) {
-  const groupRef = useRef<Group>(null)
-  const highlights = useMemo(() => highlightMap(step.highlights), [step.highlights])
-  const positions = useMemo(
-    () =>
-      CUBIE_POSITIONS.flatMap((x) =>
-        CUBIE_POSITIONS.flatMap((y) =>
-          CUBIE_POSITIONS.map((z) => [x, y, z] as const satisfies CubiePosition),
-        ),
-      ),
-    [],
-  )
-  const targetRotation = useMemo(() => new Euler(...step.cubeState.rotation), [step.cubeState.rotation])
+function CubieSet({ cubies, focused }: { cubies: readonly ViewCubie[]; focused: ReadonlySet<string> }) {
+  return cubies.map((cubie) => (
+    <Cubie key={cubie.key} cubie={cubie} highlighted={focused.has(cubie.key)} />
+  ))
+}
 
-  useFrame(() => {
-    if (!groupRef.current) return
+function AnimatedCube({
+  cube,
+  activeMove,
+  animationKey,
+  focusedPieces,
+  playing,
+  reducedMotion,
+  speed,
+  onMoveComplete,
+}: Omit<CubeSceneProps, 'cameraPosition'>) {
+  const movingRef = useRef<Group>(null)
+  const progress = useRef(0)
+  const completed = useRef(false)
+  const { size } = useThree()
+  const layout = sceneLayout(size.width, size.height)
+  const focused = useMemo(() => new Set(focusedPieces), [focusedPieces])
+  const cubies = useMemo(() => cubiesFromState(cube), [cube])
+  const moving = activeMove ? cubies.filter((cubie) => moveAffectsPosition(activeMove, cubie.position)) : []
+  const still = activeMove ? cubies.filter((cubie) => !moveAffectsPosition(activeMove, cubie.position)) : cubies
 
-    groupRef.current.rotation.x += (targetRotation.x - groupRef.current.rotation.x) * 0.08
-    groupRef.current.rotation.y += (targetRotation.y - groupRef.current.rotation.y) * 0.08
-    groupRef.current.rotation.z += (targetRotation.z - groupRef.current.rotation.z) * 0.08
+  useEffect(() => {
+    progress.current = 0
+    completed.current = false
+    movingRef.current?.rotation.set(0, 0, 0)
+  }, [animationKey])
+
+  useFrame((_, delta) => {
+    if (!activeMove || !playing || completed.current || !movingRef.current) return
+    const duration = reducedMotion ? 0 : 0.48 / speed
+    progress.current = duration === 0 ? 1 : Math.min(1, progress.current + delta / duration)
+    const eased = 1 - (1 - progress.current) ** 3
+    const { axis, angle } = moveRotation(activeMove)
+    movingRef.current.rotation[axis] = angle * eased
+
+    if (progress.current === 1) {
+      completed.current = true
+      onMoveComplete()
+    }
   })
 
   return (
-    <group ref={groupRef} scale={0.72}>
-      {positions.map((position) => (
-        <Cubie
-          key={positionKey(position)}
-          position={position}
-          highlight={highlights.get(positionKey(position))}
-        />
-      ))}
+    <group scale={layout.scale}>
+      <CubieSet cubies={still} focused={focused} />
+      <group ref={movingRef}>
+        <CubieSet cubies={moving} focused={focused} />
+      </group>
     </group>
   )
 }
 
-export function CubeScene({ step }: CubeSceneProps) {
+function CameraRig({ position }: { position: readonly [number, number, number] }) {
+  const { camera, size } = useThree()
+  const layout = sceneLayout(size.width, size.height)
+  const target = useMemo(
+    () => new Vector3(...position).multiplyScalar(layout.distance),
+    [layout.distance, position],
+  )
+
+  useFrame(() => {
+    camera.position.lerp(target, 0.08)
+    camera.lookAt(0, layout.targetY, 0)
+  })
+  return null
+}
+
+class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('Cube scene failed', error, info) }
+  render() { return this.state.failed ? this.props.fallback : this.props.children }
+}
+
+function SceneFallback() {
   return (
-    <Canvas
-      camera={{ position: step.cameraPosition, fov: 38 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true }}
-    >
-      <color attach="background" args={['#eef2f3']} />
-      <ambientLight intensity={1.3} />
-      <directionalLight position={[3, 5, 4]} intensity={2.1} />
-      <directionalLight position={[-4, 2, -3]} intensity={0.9} />
-      <CameraRig step={step} />
-      <RubikMock step={step} />
-      <OrbitControls enablePan={false} minDistance={4.8} maxDistance={10} />
-    </Canvas>
+    <div className="scene-fallback" role="alert">
+      <strong>3D preview unavailable</strong>
+      <span>Your browser could not start WebGL. The move guide remains available.</span>
+    </div>
+  )
+}
+
+export function CubeScene(props: CubeSceneProps) {
+  const [contextLost, setContextLost] = useState(false)
+  if (contextLost) return <SceneFallback />
+
+  return (
+    <SceneBoundary fallback={<SceneFallback />}>
+      <Canvas
+        camera={{ position: props.cameraPosition, fov: 38 }}
+        dpr={[1, 1.75]}
+        gl={{ antialias: true, powerPreference: 'high-performance' }}
+        onCreated={({ gl }) => {
+          gl.domElement.addEventListener('webglcontextlost', (event) => {
+            event.preventDefault()
+            setContextLost(true)
+          }, { once: true })
+        }}
+      >
+        <color attach="background" args={['#e9edf2']} />
+        <ambientLight intensity={1.45} />
+        <directionalLight position={[4, 6, 5]} intensity={2.2} />
+        <directionalLight position={[-4, 2, -3]} intensity={0.8} />
+        <CameraRig position={props.cameraPosition} />
+        <AnimatedCube {...props} />
+        <OrbitControls
+          enabled={!props.playing}
+          enablePan={false}
+          minDistance={5}
+          maxDistance={10}
+        />
+      </Canvas>
+    </SceneBoundary>
   )
 }
