@@ -1,15 +1,23 @@
 import { Edges, OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Component, useEffect, useMemo, useRef, useState, type ErrorInfo, type ReactNode } from 'react'
+import { Component, useEffect, useLayoutEffect, useMemo, useRef, useState, type ErrorInfo, type ReactNode } from 'react'
 import { Vector3, type Group } from 'three'
 import type { CubeState, Face, Move, Sticker, Vec3 } from './cube'
-import { cubiesFromState, moveAffectsPosition, moveRotation, sceneLayout, type ViewCubie } from './cubeView'
+import {
+  cubieAppearance,
+  cubiesFromState,
+  moveAffectsPosition,
+  moveRotation,
+  resolveFocusedPieceIds,
+  sceneLayout,
+  type ViewCubie,
+} from './cubeView'
 
 type CubeSceneProps = {
   cube: CubeState
   activeMove?: Move
   animationKey: string
-  focusedPieces: readonly string[]
+  focusedTargets: readonly string[]
   cameraPosition: readonly [number, number, number]
   playing: boolean
   reducedMotion: boolean
@@ -36,15 +44,13 @@ function normalRotation([x, y, z]: Vec3): [number, number, number] {
   return [0, 0, 0]
 }
 
-function Facelet({ sticker, highlighted }: { sticker: Sticker; highlighted: boolean }) {
+function Facelet({ sticker }: { sticker: Sticker }) {
   const position = sticker.normal.map((value) => value * 0.511) as [number, number, number]
   return (
     <mesh position={position} rotation={normalRotation(sticker.normal)}>
       <planeGeometry args={[0.82, 0.82]} />
       <meshStandardMaterial
         color={STICKER_COLORS[sticker.color]}
-        emissive={highlighted ? '#ffd166' : '#000000'}
-        emissiveIntensity={highlighted ? 0.22 : 0}
         roughness={0.4}
       />
     </mesh>
@@ -53,15 +59,16 @@ function Facelet({ sticker, highlighted }: { sticker: Sticker; highlighted: bool
 
 function Cubie({ cubie, highlighted }: { cubie: ViewCubie; highlighted: boolean }) {
   const position = cubie.position.map((value) => value * CUBIE_GAP) as [number, number, number]
+  const appearance = cubieAppearance(highlighted)
   return (
     <group position={position}>
       <mesh>
         <boxGeometry args={[0.98, 0.98, 0.98]} />
-        <meshStandardMaterial color={highlighted ? '#242a35' : '#11151d'} roughness={0.7} />
-        <Edges color={highlighted ? '#ffd166' : '#3f4652'} linewidth={highlighted ? 2 : 1} />
+        <meshStandardMaterial color={appearance.bodyColor} roughness={0.7} />
+        <Edges color={appearance.edgeColor} linewidth={1} />
       </mesh>
       {cubie.stickers.map((sticker) => (
-        <Facelet key={sticker.id} sticker={sticker} highlighted={highlighted} />
+        <Facelet key={sticker.id} sticker={sticker} />
       ))}
     </group>
   )
@@ -77,7 +84,7 @@ function AnimatedCube({
   cube,
   activeMove,
   animationKey,
-  focusedPieces,
+  focusedTargets,
   playing,
   reducedMotion,
   speed,
@@ -88,12 +95,15 @@ function AnimatedCube({
   const completed = useRef(false)
   const { size } = useThree()
   const layout = sceneLayout(size.width, size.height)
-  const focused = useMemo(() => new Set(focusedPieces), [focusedPieces])
+  const focused = useMemo(
+    () => new Set(resolveFocusedPieceIds(focusedTargets)),
+    [focusedTargets],
+  )
   const cubies = useMemo(() => cubiesFromState(cube), [cube])
   const moving = activeMove ? cubies.filter((cubie) => moveAffectsPosition(activeMove, cubie.position)) : []
   const still = activeMove ? cubies.filter((cubie) => !moveAffectsPosition(activeMove, cubie.position)) : cubies
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     progress.current = 0
     completed.current = false
     movingRef.current?.rotation.set(0, 0, 0)

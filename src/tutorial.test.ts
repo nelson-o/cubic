@@ -29,6 +29,7 @@ describe('tutorial cases', () => {
       'yellow-edges',
     ])
     expect(tutorialCases.length).toBeGreaterThanOrEqual(12)
+    expect(tutorialCases.every((item) => 'focusedTargets' in item)).toBe(true)
   })
 
   test('every setup preserves the previous checkpoint and every replay reaches its target', () => {

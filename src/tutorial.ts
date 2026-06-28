@@ -24,7 +24,7 @@ export type TutorialCase = {
   readonly instruction: string
   readonly setup: readonly Move[]
   readonly algorithm: readonly Move[]
-  readonly focusedPieces: readonly string[]
+  readonly focusedTargets: readonly string[]
   readonly camera: readonly [x: number, y: number, z: number]
   readonly checkpoint: (state: CubeState) => boolean
 }
@@ -114,79 +114,79 @@ export const tutorialCases: readonly TutorialCase[] = [
   defineCase({
     id: 'cross-flipped', stage: 'white-cross', title: 'Flip a white edge',
     instruction: 'Align the side color with its center, then turn that face twice.',
-    algorithm: 'F2', focusedPieces: ['0,-1,1'], camera: defaultCamera,
+    algorithm: 'F2', focusedTargets: ['0,-1,1'], camera: defaultCamera,
     checkpoint: checkpoints.whiteCross,
   }),
   defineCase({
     id: 'cross-side', stage: 'white-cross', title: 'Lift an edge from the side',
     instruction: 'Lift the white edge, align its partner color, and return it to the base.',
-    algorithm: "F U R U'", focusedPieces: ['0,-1,1'], camera: defaultCamera,
+    algorithm: "F U R U'", focusedTargets: ['0,-1,1'], camera: defaultCamera,
     checkpoint: checkpoints.whiteCross,
   }),
   defineCase({
     id: 'corner-right', stage: 'white-corners', title: 'Insert from the right',
     instruction: 'Place the corner above its slot and use the right-hand trigger.',
-    algorithm: "R U R'", focusedPieces: ['1,-1,1'], camera: defaultCamera,
+    algorithm: "R U R'", focusedTargets: ['1,-1,1'], camera: defaultCamera,
     checkpoint: checkpoints.firstLayer,
   }),
   defineCase({
     id: 'corner-left', stage: 'white-corners', title: 'Insert from the left',
     instruction: 'Place the corner above its slot and use the mirrored trigger.',
-    algorithm: "L' U' L", focusedPieces: ['-1,-1,1'], camera: defaultCamera,
+    algorithm: "L' U' L", focusedTargets: ['-1,-1,1'], camera: defaultCamera,
     checkpoint: checkpoints.firstLayer,
   }),
   defineCase({
     id: 'middle-right', stage: 'middle-edges', title: 'Insert a right edge',
     instruction: 'Match the front center, move the edge away, then open and restore its slot.',
-    algorithm: "U R U' R' U' F' U F", focusedPieces: ['1,0,1'], camera: defaultCamera,
+    algorithm: "U R U' R' U' F' U F", focusedTargets: ['1,0,1'], camera: defaultCamera,
     checkpoint: checkpoints.middleLayer,
   }),
   defineCase({
     id: 'middle-left', stage: 'middle-edges', title: 'Insert a left edge',
     instruction: 'Mirror the insertion when the target belongs left of the front center.',
-    algorithm: "U' L' U L U F U' F'", focusedPieces: ['-1,0,1'], camera: defaultCamera,
+    algorithm: "U' L' U L U F U' F'", focusedTargets: ['-1,0,1'], camera: defaultCamera,
     checkpoint: checkpoints.middleLayer,
   }),
   defineCase({
     id: 'yellow-cross-line', stage: 'yellow-cross', title: 'Line to yellow cross',
     instruction: 'Hold the yellow line horizontally and run the cross pattern once.',
-    algorithm: "F R U R' U' F'", focusedPieces: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
+    algorithm: "F R U R' U' F'", focusedTargets: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
     checkpoint: checkpoints.yellowCross,
   }),
   defineCase({
     id: 'yellow-cross-l', stage: 'yellow-cross', title: 'L shape to yellow cross',
     instruction: 'Hold the L at the back-left and repeat the cross pattern.',
-    algorithm: "F R U R' U' F' F R U R' U' F'", focusedPieces: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
+    algorithm: "F R U R' U' F' F R U R' U' F'", focusedTargets: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
     checkpoint: checkpoints.yellowCross,
   }),
   defineCase({
     id: 'yellow-cross-dot', stage: 'yellow-cross', title: 'Dot to yellow cross',
     instruction: 'Repeat the same pattern, reorienting the top pattern between passes.',
-    algorithm: "F R U R' U' F' F R U R' U' F' U F R U R' U' F'", focusedPieces: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
+    algorithm: "F R U R' U' F' F R U R' U' F' U F R U R' U' F'", focusedTargets: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
     checkpoint: checkpoints.yellowCross,
   }),
   defineCase({
     id: 'yellow-face-one', stage: 'yellow-face', title: 'Orient yellow corners',
     instruction: 'Keep the oriented corner at front-left and repeat the corner pattern.',
-    algorithm: "R U R' U R U2 R'", focusedPieces: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
+    algorithm: "R U R' U R U2 R'", focusedTargets: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
     checkpoint: checkpoints.yellowFace,
   }),
   defineCase({
     id: 'yellow-face-repeat', stage: 'yellow-face', title: 'Repeat to finish yellow',
     instruction: 'Turn only the top to normalize the case, then repeat the same pattern.',
-    algorithm: "R U R' U R U2 R' R U R' U R U2 R'", focusedPieces: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
+    algorithm: "R U R' U R U2 R' R U R' U R U2 R'", focusedTargets: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
     checkpoint: checkpoints.yellowFace,
   }),
   defineCase({
     id: 'position-yellow-corners', stage: 'yellow-corners', title: 'Position yellow corners',
     instruction: 'Keep a correct corner at front-right and repeat until all corners belong.',
-    algorithm: "R' F R' B2 R F' R' B2 R2", focusedPieces: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
+    algorithm: "R' F R' B2 R F' R' B2 R2", focusedTargets: ['1,1,1', '1,1,-1', '-1,1,-1', '-1,1,1'], camera: defaultCamera,
     checkpoint: checkpoints.yellowCornersPositioned,
   }),
   defineCase({
     id: 'position-yellow-edges', stage: 'yellow-edges', title: 'Cycle the final edges',
     instruction: 'Keep the solved side at the back and repeat the edge cycle as needed.',
-    algorithm: "F2 U L R' F2 L' R U F2", focusedPieces: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
+    algorithm: "F2 U L R' F2 L' R U F2", focusedTargets: ['0,1,1', '1,1,0', '0,1,-1', '-1,1,0'], camera: defaultCamera,
     checkpoint: checkpoints.solved,
   }),
 ]

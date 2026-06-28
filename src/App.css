@@ -162,6 +162,7 @@
   display: grid;
   grid-template-columns: 38px 38px minmax(110px, 1fr) 56px 38px;
   gap: 7px;
+  margin-top: 14px;
 }
 
 .replay-controls button,

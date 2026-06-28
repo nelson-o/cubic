@@ -10,4 +10,5 @@ test('renders the first guided replay and its accessible controls', () => {
   expect(html).toContain('All cases')
   expect(html).toContain('Previous case')
   expect(html).toContain('Replay speed')
+  expect(html.indexOf('class="replay-controls"')).toBeLessThan(html.indexOf('<h1>'))
 })

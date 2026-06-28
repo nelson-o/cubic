@@ -46,7 +46,7 @@ function App() {
           cube={state.cube}
           activeMove={activeMove}
           animationKey={`${state.revision}:${state.moveIndex}`}
-          focusedPieces={tutorialCase.focusedPieces}
+          focusedTargets={tutorialCase.focusedTargets}
           cameraPosition={tutorialCase.camera}
           playing={state.status === 'playing'}
           reducedMotion={reducedMotion}
@@ -79,20 +79,6 @@ function App() {
           <span>Layer {stage.layer} · Case {stageCaseIndex + 1}/{stageCases.length}</span>
           <span>{state.moveIndex}/{tutorialCase.algorithm.length} moves</span>
         </div>
-        <h1>{tutorialCase.title}</h1>
-        <p>{tutorialCase.instruction}</p>
-
-        <div className="notation" aria-label="Move sequence">
-          {tutorialCase.algorithm.map((move, index) => (
-            <span
-              key={`${moveToNotation(move)}-${index}`}
-              className={index === state.moveIndex ? 'current' : index < state.moveIndex ? 'complete' : undefined}
-            >
-              {moveToNotation(move)}
-            </span>
-          ))}
-        </div>
-
         <div className="replay-controls">
           <button type="button" onClick={() => goRelative(-1)} disabled={state.caseIndex === 0} aria-label="Previous case">
             ←
@@ -122,6 +108,19 @@ function App() {
           <button type="button" onClick={() => goRelative(1)} disabled={state.caseIndex === tutorialCases.length - 1} aria-label="Next case">
             →
           </button>
+        </div>
+        <h1>{tutorialCase.title}</h1>
+        <p>{tutorialCase.instruction}</p>
+
+        <div className="notation" aria-label="Move sequence">
+          {tutorialCase.algorithm.map((move, index) => (
+            <span
+              key={`${moveToNotation(move)}-${index}`}
+              className={index === state.moveIndex ? 'current' : index < state.moveIndex ? 'complete' : undefined}
+            >
+              {moveToNotation(move)}
+            </span>
+          ))}
         </div>
         <div className="interaction-hint" aria-live="polite">
           <span className={`status-light ${state.status}`} />
