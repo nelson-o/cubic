@@ -19,6 +19,7 @@ function useReducedMotion() {
 function App() {
   const [state, dispatch] = useReducer(replayReducer, undefined, () => createReplayState())
   const [libraryOpen, setLibraryOpen] = useState(false)
+  const [distanceOverride, setDistanceOverride] = useState(1)
   const reducedMotion = useReducedMotion()
   const tutorialCase = getTutorialCase(state.caseIndex)
   const stageIndex = tutorialStages.findIndex((stage) => stage.id === tutorialCase.stage)
@@ -51,6 +52,7 @@ function App() {
           playing={state.status === 'playing'}
           reducedMotion={reducedMotion}
           speed={state.speed}
+          distanceOverride={distanceOverride}
           onMoveComplete={() => dispatch({ type: 'commit-move' })}
         />
       </section>
@@ -108,6 +110,22 @@ function App() {
           <button type="button" onClick={() => goRelative(1)} disabled={state.caseIndex === tutorialCases.length - 1} aria-label="Next case">
             →
           </button>
+          <label className="distance-control">
+            <span>Camera distance</span>
+            <input
+              type="number"
+              min={0.5}
+              max={5}
+              step={0.1}
+              value={distanceOverride}
+              onChange={(event) => {
+                const nextDistance = event.currentTarget.valueAsNumber
+                if (Number.isFinite(nextDistance)) {
+                  setDistanceOverride(Math.min(5, Math.max(0.5, nextDistance)))
+                }
+              }}
+            />
+          </label>
         </div>
         <h1>{tutorialCase.title}</h1>
         <p>{tutorialCase.instruction}</p>
