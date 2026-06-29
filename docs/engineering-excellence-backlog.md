@@ -15,10 +15,10 @@ to maintain, safer to deploy, and better covered against user-facing regressions
 
 ## Recommended First Batch
 
-1. Harden CI.
-   - Add `bun run lint` to the Pages workflow.
-   - Pin the Bun version instead of using `bun-version: latest`.
-   - Add a single local `verify` script that runs tests, lint, and build.
+1. Harden CI. Done in `1.3.14`/`verify` workflow update.
+   - [x] Add `bun run lint` to the Pages workflow.
+   - [x] Pin the Bun version instead of using `bun-version: latest`.
+   - [x] Add a single local `verify` script that runs tests, lint, and build.
 
 2. Add browser-level smoke coverage.
    - Use Playwright to verify the deployed app shell renders.
@@ -67,7 +67,7 @@ on whether the control is meant for learners or for development inspection.
 
 ## Priority Order
 
-1. CI hardening
+1. CI hardening - done
 2. Playwright smoke tests
 3. Case library accessibility
 4. Bundle-size decision
