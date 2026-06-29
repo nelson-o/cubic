@@ -32,9 +32,9 @@ export function cubieAppearance(highlighted: boolean) {
 }
 
 export function sceneLayout(width: number, height: number) {
-  if (width <= 900 && height < 500) return { scale: 0.56, targetY: -0.28, distance: 1.08 } as const
-  if (width <= 900 && height < 650) return { scale: 0.58, targetY: -0.42, distance: 1.1 } as const
-  if (width <= 900) return { scale: 0.68, targetY: -0.36, distance: 1.06 } as const
+  if (width <= 900 && height < 500) return { scale: 0.56, targetY: -0.28, distance: 2 } as const
+  if (width <= 900 && height < 650) return { scale: 0.58, targetY: -0.42, distance: 1.8 } as const
+  if (width <= 900) return { scale: 0.68, targetY: -0.36, distance: 1.4 } as const
   return { scale: 0.74, targetY: 0, distance: 1 } as const
 }
 

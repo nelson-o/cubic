@@ -22,7 +22,6 @@ type CubeSceneProps = {
   playing: boolean
   reducedMotion: boolean
   speed: number
-  distanceOverride?: number
   onMoveComplete: () => void
 }
 
@@ -134,13 +133,12 @@ function AnimatedCube({
   )
 }
 
-function CameraRig({ position, distanceOverride }: { position: readonly [number, number, number]; distanceOverride?: number }) {
+function CameraRig({ position }: { position: readonly [number, number, number] }) {
   const { camera, size } = useThree()
   const layout = sceneLayout(size.width, size.height)
-  const distance = distanceOverride ?? layout.distance
   const target = useMemo(
-    () => new Vector3(...position).multiplyScalar(distance),
-    [distance, position],
+    () => new Vector3(...position).multiplyScalar(layout.distance),
+    [layout.distance, position],
   )
 
   useEffect(() => {
@@ -162,7 +160,7 @@ function CameraOrbit({ enabled }: { enabled: boolean }) {
       dampingFactor={0.08}
       enablePan={false}
       minDistance={2}
-      maxDistance={60}
+      maxDistance={24}
       minPolarAngle={0.3}
       maxPolarAngle={Math.PI - 0.3}
       target={[0, layout.targetY, 0]}
@@ -207,7 +205,7 @@ export function CubeScene(props: CubeSceneProps) {
         <ambientLight intensity={1.45} />
         <directionalLight position={[4, 6, 5]} intensity={2.2} />
         <directionalLight position={[-4, 2, -3]} intensity={0.8} />
-        <CameraRig position={props.cameraPosition} distanceOverride={props.distanceOverride} />
+        <CameraRig position={props.cameraPosition} />
         <AnimatedCube {...props} />
         <CameraOrbit enabled={!props.playing} />
       </Canvas>

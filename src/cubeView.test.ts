@@ -29,9 +29,9 @@ describe('cube view adapter', () => {
   })
 
   test('keeps the cube clear of overlays across target viewport classes', () => {
-    expect(sceneLayout(320, 568)).toEqual({ scale: 0.58, targetY: -0.42, distance: 1.1 })
-    expect(sceneLayout(390, 844)).toEqual({ scale: 0.68, targetY: -0.36, distance: 1.06 })
-    expect(sceneLayout(844, 390)).toEqual({ scale: 0.56, targetY: -0.28, distance: 1.08 })
+    expect(sceneLayout(320, 568)).toEqual({ scale: 0.58, targetY: -0.42, distance: 1.8 })
+    expect(sceneLayout(390, 844)).toEqual({ scale: 0.68, targetY: -0.36, distance: 1.4 })
+    expect(sceneLayout(844, 390)).toEqual({ scale: 0.56, targetY: -0.28, distance: 2 })
     expect(sceneLayout(1440, 900)).toEqual({ scale: 0.74, targetY: 0, distance: 1 })
   })
 
