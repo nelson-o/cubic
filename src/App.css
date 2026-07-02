@@ -77,10 +77,6 @@
   text-transform: none;
 }
 
-.stage-dots { display: flex; gap: 5px; }
-.stage-dots i { width: 22px; height: 3px; border-radius: 9px; background: rgba(17, 24, 39, .13); }
-.stage-dots i.active { background: #2563eb; }
-
 .library-button {
   justify-self: end;
   min-height: 38px;
@@ -235,7 +231,6 @@ select:focus-visible { outline: 3px solid rgba(37, 99, 235, .25); outline-offset
   .top-bar { top: max(11px, env(safe-area-inset-top)); left: 12px; right: 12px; grid-template-columns: auto 1fr auto; align-items: center; }
   .brand > span:last-child { display: none; }
   .stage-progress { min-width: 0; gap: 3px; }
-  .stage-dots i { width: clamp(11px, 3.8vw, 18px); }
   .library-button { font-size: 0; }
   .library-button::before { content: 'Cases'; font-size: 13px; }
   .library-button span { font-size: 10px; }

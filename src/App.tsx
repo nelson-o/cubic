@@ -62,11 +62,6 @@ function App() {
         </button>
         <div className="stage-progress" aria-label={`Stage ${stageIndex + 1} of ${tutorialStages.length}`}>
           <span>Layer {stage.layer}</span>
-          <div className="stage-dots" aria-hidden="true">
-            {tutorialStages.map((item, index) => (
-              <i key={item.id} className={index <= stageIndex ? 'active' : undefined} />
-            ))}
-          </div>
           <strong>{stage.label}</strong>
         </div>
         <button className="library-button" type="button" onClick={() => setLibraryOpen(true)}>
